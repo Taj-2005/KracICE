@@ -1126,9 +1126,12 @@ export default function KracICEWebsite() {
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center space-x-3 mb-4 md:mb-0">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">AI</span>
-                </div>
+                <Image
+                src="/logo.jpeg"
+                alt='KracICE Logo'
+                width={50}
+                height={50}
+                />
                 <div>
                   <span className="font-bold">KracICE</span>
                   <p className="text-sm text-gray-400">India's Exam-Cracking AI</p>
