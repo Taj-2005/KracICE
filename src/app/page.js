@@ -1,8 +1,249 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { ChevronRight, Brain, MessageCircle, FileText, Zap, CheckCircle, Star, Upload, Play, Users, Target, TrendingUp, Clock, Award, BookOpen, ArrowLeft, Send, Camera, Mic, Home, User, Settings, BarChart3, Timer, RefreshCw, X, Menu } from 'lucide-react';
 
+const mockQuestions = [
+  {
+    id: 1,
+    subject: 'Physics',
+    question: 'A ball is thrown vertically upward with an initial velocity of 20 m/s. What is the maximum height reached? (g = 10 m/s²)',
+    options: ['10 m', '20 m', '30 m', '40 m'],
+    correct: 1,
+    difficulty: 'Medium'
+  },
+  {
+    id: 2,
+    subject: 'Chemistry',
+    question: 'Which of the following is the molecular formula of glucose?',
+    options: ['C₆H₁₂O₆', 'C₆H₁₀O₅', 'C₅H₁₀O₅', 'C₆H₁₄O₆'],
+    correct: 0,
+    difficulty: 'Easy'
+  },
+  {
+    id: 3,
+    subject: 'Mathematics',
+    question: 'If log₂(x) = 3, then x equals:',
+    options: ['6', '8', '9', '12'],
+    correct: 1,
+    difficulty: 'Medium'
+  }
+];
+
+const MockTestPage = () => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState(Array(mockQuestions.length).fill(null));
+  const [showReport, setShowReport] = useState(false);
+
+  // For timer
+  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes for example
+
+  useEffect(() => {
+    if (showReport) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setShowReport(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [showReport]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  };
+
+  // Render Report Page
+  if (showReport) {
+    return (
+      <div className="text-black min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-6">Test Report</h1>
+          {mockQuestions.map((q, index) => (
+            <div key={q.id} className="bg-white p-6 mb-4 rounded-xl shadow border">
+              <h2 className="text-lg font-semibold mb-2">
+                Q{index + 1}. {q.question}
+              </h2>
+              <p className="mb-1">
+                Your Answer:{' '}
+                {answers[index] !== null
+                  ? q.options[answers[index]]
+                  : <span className="text-red-500">Not Answered</span>}
+              </p>
+              <p>
+                Correct Answer:{' '}
+                <span className="font-bold text-green-600">{q.options[q.correct]}</span>
+              </p>
+              {answers[index] === q.correct ? (
+                <p className="text-green-600 font-medium mt-1">✅ Correct</p>
+              ) : (
+                <p className="text-red-600 font-medium mt-1">❌ Incorrect</p>
+              )}
+            </div>
+          ))}
+          <button
+            onClick={() => {
+              setShowReport(false);
+              setCurrentQuestion(0);
+              setAnswers(Array(mockQuestions.length).fill(null));
+              setTimeLeft(15 * 60);
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retake Test
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => setCurrentQuestion(0)}
+              className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Dashboard
+            </button>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center text-orange-600">
+                <Timer className="w-5 h-5 mr-2" />
+                <span className="font-mono text-lg font-bold">{formatTime(timeLeft)}</span>
+              </div>
+              <button
+                onClick={() => setShowReport(true)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Submit Test
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">NEET Mock Test - {mockQuestions[currentQuestion].subject}</h1>
+              <p className="text-gray-600">Question {currentQuestion + 1} of {mockQuestions.length}</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Progress:</span>
+              <div className="w-32 bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${((currentQuestion + 1) / mockQuestions.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Question */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                {mockQuestions[currentQuestion].subject}
+              </span>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                mockQuestions[currentQuestion].difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                  mockQuestions[currentQuestion].difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+              }`}>
+                {mockQuestions[currentQuestion].difficulty}
+              </span>
+            </div>
+            <button className="text-gray-400 hover:text-gray-600">
+              <BookOpen className="w-5 h-5" />
+            </button>
+          </div>
+
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 leading-relaxed">
+            {mockQuestions[currentQuestion].question}
+          </h2>
+
+          <div className="space-y-3">
+            {mockQuestions[currentQuestion].options.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  const updated = [...answers];
+                  updated[currentQuestion] = index;
+                  setAnswers(updated);
+                }}
+                className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
+                  answers[currentQuestion] === index
+                    ? 'border-blue-500 bg-blue-50 text-blue-800'
+                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex text-black items-center">
+                  <span className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center text-sm font-medium ${
+                    answers[currentQuestion] === index
+                      ? 'border-blue-500 bg-blue-500 text-white'
+                      : 'border-gray-300'
+                  }`}>
+                    {String.fromCharCode(65 + index)}
+                  </span>
+                  {option}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between">
+          <button
+            onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
+            disabled={currentQuestion === 0}
+            className="flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Previous
+          </button>
+
+          <div className="flex space-x-2">
+            {mockQuestions.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentQuestion(index)}
+                className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                  index === currentQuestion
+                    ? 'bg-blue-600 text-white'
+                    : index < currentQuestion
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setCurrentQuestion(Math.min(mockQuestions.length - 1, currentQuestion + 1))}
+            disabled={currentQuestion === mockQuestions.length - 1}
+            className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 export default function KracICEWebsite() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedTone, setSelectedTone] = useState('friendly');
@@ -32,33 +273,6 @@ export default function KracICEWebsite() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const mockQuestions = [
-    {
-      id: 1,
-      subject: 'Physics',
-      question: 'A ball is thrown vertically upward with an initial velocity of 20 m/s. What is the maximum height reached? (g = 10 m/s²)',
-      options: ['10 m', '20 m', '30 m', '40 m'],
-      correct: 1,
-      difficulty: 'Medium'
-    },
-    {
-      id: 2,
-      subject: 'Chemistry',
-      question: 'Which of the following is the molecular formula of glucose?',
-      options: ['C₆H₁₂O₆', 'C₆H₁₀O₅', 'C₅H₁₀O₅', 'C₆H₁₄O₆'],
-      correct: 0,
-      difficulty: 'Easy'
-    },
-    {
-      id: 3,
-      subject: 'Mathematics',
-      question: 'If log₂(x) = 3, then x equals:',
-      options: ['6', '8', '9', '12'],
-      correct: 1,
-      difficulty: 'Medium'
-    }
-  ];
 
   const tones = [
     { id: 'friendly', name: 'Friendly Study Buddy', desc: 'Encouraging and supportive' },
@@ -101,11 +315,11 @@ export default function KracICEWebsite() {
     <header className="z-50 bg-white backdrop-blur-md border-b border-blue-100 sticky top-0">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentPage('home')}>
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center">
-            <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center">
-              <span className="text-blue-600 text-xs font-bold">AI</span>
-            </div>
-          </div>
+          <Image
+          src="/logo.jpeg"
+          width={50}
+          height={50}
+          />
           <div>
             <h1 className="text-xl font-bold text-gray-900">KracICE</h1>
             <p className="text-xs text-blue-600">India's Exam-Cracking AI</p>
@@ -590,139 +804,6 @@ export default function KracICEWebsite() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const MockTestPage = () => (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <button 
-              onClick={() => setCurrentPage('dashboard')}
-              className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Dashboard
-            </button>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center text-orange-600">
-                <Timer className="w-5 h-5 mr-2" />
-                <span className="font-mono text-lg font-bold">{formatTime(timeLeft)}</span>
-              </div>
-              <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                Submit Test
-              </button>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">NEET Mock Test - Physics</h1>
-              <p className="text-gray-600">Question {currentQuestion + 1} of {mockQuestions.length}</p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Progress:</span>
-              <div className="w-32 bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                  style={{width: `${((currentQuestion + 1) / mockQuestions.length) * 100}%`}}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Question */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                {mockQuestions[currentQuestion].subject}
-              </span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                mockQuestions[currentQuestion].difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
-                mockQuestions[currentQuestion].difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {mockQuestions[currentQuestion].difficulty}
-              </span>
-            </div>
-            <button className="text-gray-400 hover:text-gray-600">
-              <BookOpen className="w-5 h-5" />
-            </button>
-          </div>
-
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 leading-relaxed">
-            {mockQuestions[currentQuestion].question}
-          </h2>
-
-          <div className="space-y-3">
-            {mockQuestions[currentQuestion].options.map((option, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedAnswer(index)}
-                className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                  selectedAnswer === index
-                    ? 'border-blue-500 bg-blue-50 text-blue-800'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex text-black items-center">
-                  <span className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center text-sm font-medium ${
-                    selectedAnswer === index
-                      ? 'border-blue-500 bg-blue-500 text-white'
-                      : 'border-gray-300'
-                  }`}>
-                    {String.fromCharCode(65 + index)}
-                  </span>
-                  {option}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex justify-between">
-          <button 
-            onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
-            disabled={currentQuestion === 0}
-            className="flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Previous
-          </button>
-          
-          <div className="flex space-x-2">
-            {mockQuestions.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentQuestion(index)}
-                className={`w-10 h-10 rounded-lg font-medium transition-colors ${
-                  index === currentQuestion
-                    ? 'bg-blue-600 text-white'
-                    : index <= currentQuestion
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-          
-          <button 
-            onClick={() => setCurrentQuestion(Math.min(mockQuestions.length - 1, currentQuestion + 1))}
-            disabled={currentQuestion === mockQuestions.length - 1}
-            className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Next
-            <ChevronRight className="w-4 h-4 ml-2" />
-          </button>
         </div>
       </div>
     </div>
