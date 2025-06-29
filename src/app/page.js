@@ -412,20 +412,9 @@ export default function KracICEWebsite() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-cyan-500/5"></div>
+        <div className="absolute inset-0 bg-white"></div>
         <div className="max-w-6xl mx-auto px-4 py-20 relative">
           <div className={`text-center transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            {/* Logo Upload Area */}
-            <div className="mb-8 flex justify-center">
-              <div className="relative group">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center shadow-xl">
-                  <div className="text-white text-2xl font-bold">❄️🧠</div>
-                </div>
-                <div className="absolute inset-0 bg-black/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <Upload className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
 
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 leading-tight">
               India's <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Exam-Cracking</span> AI
