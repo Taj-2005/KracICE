@@ -317,6 +317,7 @@ export default function KracICEWebsite() {
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentPage('home')}>
           <Image
           src="/logo.jpeg"
+          alt='KracICE Logo'
           width={50}
           height={50}
           />
